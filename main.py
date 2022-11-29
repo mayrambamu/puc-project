@@ -1,6 +1,18 @@
 import os
 import pickle
 from fastapi import FastAPI
+from pudantic import BaseModel
+
+class Data(BaseModel):
+    baseline_value: float
+    accelerations: float
+    fetal_movement: float
+    uterine_contractions: float
+    light_decelerations: float
+    severe_decelerations: float
+    prolongued_decelerations: float
+
+
 
 def load_models():
     model = pickle.load(open(os.path.join(os.getcwd(),
@@ -12,9 +24,6 @@ def load_models():
     return scaler, model
 
 scaler, model = load_models()
-
-
-
 app = FastAPI()
 
 
@@ -22,3 +31,16 @@ app = FastAPI()
 def home():
     return {'Hello': 'World'}
 
+@app.post('/api/predict')
+def predict(request: Data):
+    received_data = np.array([
+        request.baseline_value,
+        request.accelerations,
+        request.fetal_movement,
+        request.uterine_contractions,
+        request.light_decelerations,
+        request.severe_decelerations,
+        request.prolongued_decelerations
+    ]).reshape(1, -1)
+    prediction = model.predict(scaler.transform(received_data))[0]
+    return {'prediction': prediction}
