@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -6,5 +5,5 @@ app = FastAPI()
 
 @app.get('/')
 def home():
-    return {'Hello': 'Word'}
+    return {'Hello': 'World'}
 
